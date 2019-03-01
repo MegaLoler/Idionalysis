@@ -48,8 +48,8 @@ class Analysis:
         lines = list()
         lines.append(f'total words:    {self.length}')
         lines.append(f'unique words:   {self.unique}')
-        lines.append(f'unique / total: {self.unique / self.length * 100}%')
-        print('\n'.join(lines))
+        lines.append(f'unique / total: {round(self.unique / self.length * 100, 2)}%')
+        return '\n'.join(lines)
 
 def analyse_file(filename):
     with open(filename) as f:
