@@ -94,4 +94,5 @@ singly occuring words: 3404.5
 singly / unique:       50.17%
 ```
 
-![Example Plot](example.png)
+![Example Comparison Plot](example.png)
+![Example Alice Plot](alice.png)
