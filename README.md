@@ -93,3 +93,5 @@ unique / total:        13.32%
 singly occuring words: 3404.5
 singly / unique:       50.17%
 ```
+
+![Example Plot](example.png)

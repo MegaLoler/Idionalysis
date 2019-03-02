@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
 import sys, re
+import matplotlib.pyplot as plt
 
+GRAPH = True
+GRAPH_BINS_VISUAL = 100
 GRAPH_BINS_MAX = 5
 ROUND_DIGITS = 2
 #WORD_REGEXP = r'\w+[\'\-]?\w+'
@@ -151,6 +154,10 @@ class Analysis:
             lines.append(f'initial occurence breakdown: {graph_str} = {prettify(sum(graph))}')
         return '\n'.join(lines)
 
+def graph(name, analysis):
+    ''' display the analysis visually '''
+    plt.plot(analysis.graph(GRAPH_BINS_VISUAL), label=name)
+
 def analyse_file(filename):
     ''' do an analysis on a file '''
     with open(filename) as f:
@@ -178,13 +185,27 @@ def print_averages(analyses):
 
 def bulk_analyse(filenames):
     ''' do an analysis on a bunch of files! '''
+    # setup graph if doing that
+    if GRAPH:
+        plt.figure('idionalysis')
+        plt.xlabel('% text position')
+        plt.ylabel('% concentration of initial encounters of words')
     # first get each individual analyses
     analyses = list(map(analyse_file, filenames))
     # and print each result
     for filename, analysis in zip(filenames, analyses):
         print(f'[{filename}]\n{analysis}\n')
+        # work the graph if doin that
+        if GRAPH: graph(filename, analysis)
     # print some averages if there was more than one
     if len(analyses) > 1: print_averages(analyses)
+    # show the graph if any
+    if GRAPH:
+        # totes stole this from stack overflow
+        plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
+        # show it
+        plt.legend()
+        plt.show()
 
 if __name__ == '__main__':
     if len(sys.argv) > 1: bulk_analyse(sys.argv[1:])
