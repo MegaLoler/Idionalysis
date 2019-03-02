@@ -4,6 +4,7 @@ import sys, re, string
 
 GRAPH_BINS_MAX = 5
 ROUND_DIGITS = 2
+WORD_REGEXP = r'[\w\-\']+'
 
 def divide(n, m):
     ''' integer divide n by m into explicit divisions
@@ -19,10 +20,6 @@ def divide(n, m):
         m -= 1
     return divisions
 
-def clean(s):
-    ''' remove non alphabet characters '''
-    return re.sub(r'[' + string.punctuation + string.digits + ']', '', s)
-
 class Analysis:
     ''' a report of data from analysis '''
 
@@ -30,7 +27,7 @@ class Analysis:
     def from_text(text):
         ''' create an analysis from a text '''
         analysis = Analysis()
-        analysis.analyse(clean(text))
+        analysis.analyse(text)
         return analysis
 
     def __init__(self, words=None, initial_encounters=None, occurences=None):
@@ -41,7 +38,7 @@ class Analysis:
     def analyse(self, text):
         ''' do the analysis and store the data '''
         # get the words in the text
-        self.words = text.split()
+        self.words = re.findall(WORD_REGEXP, text)
         # to be list of bools corresponding to which words are first encounters
         self.initial_encounters = list()
         # keep track of unique words and their number of occurences
@@ -98,9 +95,24 @@ class Analysis:
         return len(self.occurences) if self.occurences else self.initial_encounters.count(True)
 
     @property
+    def uniques(self):
+        ''' return a set of the occuring words '''
+        return set(self.occurences.keys())
+
+    @property
     def ratio(self):
         ''' return the ratio of unique to total occurences '''
         return self.unique / self.length
+
+    @property
+    def singles(self):
+        ''' return the amount of words that occur a single time '''
+        return len(list(filter(lambda word: self.occurences[word] == 1, self.uniques)))
+
+    @property
+    def sorted(self):
+        ''' return a list of occuring words sorted by frequency '''
+        return sorted(self.uniques, reverse=True, key=lambda word: self.occurences[word])
 
     def __str__(self):
         ''' make a nice report '''
@@ -111,6 +123,10 @@ class Analysis:
         lines.append(f'total words:                 {self.length}')
         lines.append(f'unique words:                {self.unique}')
         lines.append(f'unique / total:              {prettify(self.ratio)}')
+        lines.append(f'singly occuring words:       {self.singles}')
+        words = self.sorted
+        lines.append(f'top 5:                       {words[:5]}')
+        lines.append(f'bottom 5:                    {words[-5:]}')
         for bins in range(2, GRAPH_BINS_MAX + 1):
             graph = self.graph(bins)
             graph_str = ' + '.join(map(prettify, graph))
