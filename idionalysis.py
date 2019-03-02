@@ -123,16 +123,28 @@ class Analysis:
         ''' return a list of occuring words sorted by frequency '''
         return sorted(self.uniques, reverse=True, key=lambda word: self.occurences[word])
 
+    @property
+    def top(self):
+        ''' return the top 5 most occuring words '''
+        return self.sorted[:5]
+
+    @property
+    def bottom(self):
+        ''' return the top 5 least occuring words '''
+        return self.sorted[-5:]
+
     def __str__(self):
         ''' make a nice report '''
+        top = ', '.join(self.top)
+        bottom = ', '.join(self.bottom)
         lines = list()
         lines.append(f'total words:                 {self.length}')
         lines.append(f'unique words:                {self.unique}')
         lines.append(f'unique / total:              {prettify(self.ratio)}')
         lines.append(f'singly occuring words:       {self.singles}')
         lines.append(f'singly / unique:             {prettify(self.singles / self.unique)}')
-        lines.append(f'top 5:                       {self.sorted[:5]}')
-        lines.append(f'bottom 5:                    {self.sorted[-5:]}')
+        lines.append(f'top 5:                       {top}')
+        lines.append(f'bottom 5:                    {bottom}')
         for bins in range(2, GRAPH_BINS_MAX + 1):
             graph = self.graph(bins)
             graph_str = ' + '.join(map(prettify, graph))
