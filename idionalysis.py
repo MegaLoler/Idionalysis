@@ -21,6 +21,14 @@ def divide(n, m):
         m -= 1
     return divisions
 
+def round_pretty(value):
+    ''' do the convenient rounding '''
+    return round(value, ROUND_DIGITS)
+
+def prettify(value):
+    ''' stringify a value as a rounded percentage '''
+    return f'{round_pretty(value * 100)}%'
+
 class Analysis:
     ''' a report of data from analysis '''
 
@@ -117,9 +125,6 @@ class Analysis:
 
     def __str__(self):
         ''' make a nice report '''
-        def prettify(value):
-            ''' stringify a value as a rounded percentage '''
-            return f'{round(value * 100, ROUND_DIGITS)}%'
         lines = list()
         lines.append(f'total words:                 {self.length}')
         lines.append(f'unique words:                {self.unique}')
@@ -135,12 +140,40 @@ class Analysis:
         return '\n'.join(lines)
 
 def analyse_file(filename):
+    ''' do an analysis on a file '''
     with open(filename) as f:
         return Analysis.from_text(f.read())
 
+def print_averages(analyses):
+    ''' print the average results from a bulk '''
+    def get_average(attribute):
+        ''' get an average attribute given either a attribute name or a function '''
+        f = attribute if callable(attribute) else lambda analysis: getattr(analysis, attribute)
+        return sum(map(f, analyses)) / len(analyses)
+    def queue(prompt, attribute, wrapper=None):
+        ''' add a line to the report '''
+        value = get_average(attribute)
+        if wrapper: value = wrapper(value)
+        lines.append(f'{prompt} {value}')
+    lines = list()
+    queue('total words:          ', 'length', round_pretty)
+    queue('unique words:         ', 'unique', round_pretty)
+    queue('unique / total:       ', 'ratio', prettify)
+    queue('singly occuring words:', 'singles', round_pretty)
+    queue('singly / unique:      ', lambda a: a.singles / a.unique, prettify)
+    s = '\n'.join(lines)
+    print(f'[AVERAGES]\n{s}')
+
+def bulk_analyse(filenames):
+    ''' do an analysis on a bunch of files! '''
+    # first get each individual analyses
+    analyses = list(map(analyse_file, filenames))
+    # and print each result
+    for filename, analysis in zip(filenames, analyses):
+        print(f'[{filename}]\n{analysis}\n')
+    # print some averages if there was more than one
+    if len(analyses) > 1: print_averages(analyses)
+
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        for filename in sys.argv[1:]:
-            print(f'{filename}:\n{analyse_file(filename)}\n')
-    else:
-        print(f'Usage: {sys.argv[0]} [text file]')
+    if len(sys.argv) > 1: bulk_analyse(sys.argv[1:])
+    else: print(f'Usage: {sys.argv[0]} [text file]')
