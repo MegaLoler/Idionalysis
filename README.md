@@ -11,10 +11,10 @@ Heavy upfront concentration of initial occurences of words correlate with low pe
 Moby Dick (Long and Hard)
 ```bash
 $ ./idionalysis.py ~/text/moby10b.txt 
-total words:                 214112
-unique words:                31641
-unique / total:              14.78%
-initial occurence breakdown: 38.96% + 24.76% + 18.49% + 17.79% = 100.0%
+total words:                 212032
+unique words:                31258
+unique / total:              14.74%
+initial occurence breakdown: 38.72% + 24.74% + 18.59% + 17.95% = 100.0%
 ```
 Harry Potter and the Deathly Hallows (Long and Easy)
 ```bash
@@ -27,10 +27,10 @@ initial occurence breakdown: 43.13% + 22.82% + 18.5% + 15.56% = 100.0%
 Alice in Wonderland
 ```bash
 $ ./idionalysis.py ~/text/alice.txt 
-total words:                 29465
-unique words:                5583
-unique / total:              18.95%
-initial occurence breakdown: 36.29% + 22.68% + 19.15% + 21.89% = 100.0%
+total words:                 26449
+unique words:                4944
+unique / total:              18.69%
+initial occurence breakdown: 37.54% + 23.89% + 19.3% + 19.28% = 100.0%
 ```
 The Elfin Hill
 ```bash
@@ -43,16 +43,16 @@ initial occurence breakdown: 33.72% + 26.6% + 22.2% + 17.49% = 100.0%
 Siddhartha (German)
 ```bash
 $ ./idionalysis.py ~/text/siddhartha.txt 
-total words:                 37428
-unique words:                8307
-unique / total:              22.19%
-initial occurence breakdown: 35.45% + 25.15% + 18.41% + 20.99% = 100.0%
+total words:                 34367
+unique words:                7447
+unique / total:              21.67%
+initial occurence breakdown: 36.65% + 26.14% + 19.67% + 17.54% = 100.0%
 ```
 Siddhartha (English)
 ```bash
 $ ./idionalysis.py ~/text/siddhartha_en.txt 
-total words:                 42166
-unique words:                6512
-unique / total:              15.44%
-initial occurence breakdown: 38.93% + 25.35% + 16.32% + 19.39% = 100.0%
+total words:                 39139
+unique words:                5898
+unique / total:              15.07%
+initial occurence breakdown: 40.34% + 26.94% + 17.11% + 15.62% = 100.0%
 ```
