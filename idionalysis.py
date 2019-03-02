@@ -55,7 +55,7 @@ class Analysis:
         # be case insensitive
         word = word.lower()
         # check if it's a first encounter
-        initial_encounter = not word in self.occurences
+        initial_encounter = word not in self.occurences
         # make the appropriate record
         self.occurences[word] = 1 if initial_encounter else self.occurences[word] + 1
         # return whether it was a first encounter
