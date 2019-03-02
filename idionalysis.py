@@ -156,7 +156,16 @@ class Analysis:
 
 def graph(name, analysis):
     ''' display the analysis visually '''
+    # the main graph
+    plt.figure('Idionalysis')
     plt.plot(analysis.graph(GRAPH_BINS_VISUAL), label=name)
+    # the local graph
+    plt.figure(name)
+    plt.title(name)
+    plt.bar(range(0, GRAPH_BINS_VISUAL), analysis.graph(GRAPH_BINS_VISUAL), label=name)
+    # totes stole this from stack overflow
+    plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
+    plt.gca().set_xticklabels(['{:.0f}%'.format(x*100/GRAPH_BINS_VISUAL) for x in plt.gca().get_xticks()])
 
 def analyse_file(filename):
     ''' do an analysis on a file '''
@@ -187,7 +196,9 @@ def bulk_analyse(filenames):
     ''' do an analysis on a bunch of files! '''
     # setup graph if doing that
     if GRAPH:
-        plt.figure('idionalysis')
+        # the main comparison graph
+        plt.figure('Idionalysis')
+        plt.title('Comparison')
         plt.xlabel('% text position')
         plt.ylabel('% concentration of initial encounters of words')
     # first get each individual analyses
@@ -201,6 +212,7 @@ def bulk_analyse(filenames):
     if len(analyses) > 1: print_averages(analyses)
     # show the graph if any
     if GRAPH:
+        plt.figure('Idionalysis')
         # totes stole this from stack overflow
         plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
         plt.gca().set_xticklabels(['{:.0f}%'.format(x*100/GRAPH_BINS_VISUAL) for x in plt.gca().get_xticks()])
