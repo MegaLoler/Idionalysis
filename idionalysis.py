@@ -162,7 +162,7 @@ def graph(name, analysis):
     # the local graph
     plt.figure(name)
     plt.title(name)
-    plt.bar(range(0, GRAPH_BINS_VISUAL), analysis.graph(GRAPH_BINS_VISUAL), label=name)
+    plt.bar(range(0, GRAPH_BINS_VISUAL), analysis.graph(GRAPH_BINS_VISUAL), align='edge')
     # totes stole this from stack overflow
     plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
     plt.gca().set_xticklabels(['{:.0f}%'.format(x*100/GRAPH_BINS_VISUAL) for x in plt.gca().get_xticks()])
