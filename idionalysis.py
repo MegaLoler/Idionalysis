@@ -4,7 +4,8 @@ import sys, re, string
 
 GRAPH_BINS_MAX = 5
 ROUND_DIGITS = 2
-WORD_REGEXP = r'\w+[\'\-]?\w+'
+#WORD_REGEXP = r'\w+[\'\-]?\w+'
+WORD_REGEXP = r'\w*\'?(?:\w+[\'\-]?)*\w+'
 
 def divide(n, m):
     ''' integer divide n by m into explicit divisions
