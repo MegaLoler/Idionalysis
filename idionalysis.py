@@ -2,7 +2,7 @@
 
 import sys
 
-GRAPH_BINS = 50
+GRAPH_BINS = 4
 ROUND_DIGITS = 2
 
 def divide(n, m):
@@ -79,9 +79,9 @@ class Analysis:
         return chunks
 
     def graph(self, chunks):
-        ''' return the concentration of how many initial words each divided chunk has '''
+        ''' return concentration of initial occurences of vocabulary in each chunk '''
         chunks = self.divide(chunks)
-        return list(map(lambda chunk: chunk.unique / chunk.length, chunks))
+        return list(map(lambda chunk: chunk.unique / self.unique, chunks))
 
     @property
     def length(self):
@@ -104,12 +104,12 @@ class Analysis:
             ''' stringify a value as a rounded percentage '''
             return f'{round(value * 100, ROUND_DIGITS)}%'
         lines = list()
-        lines.append(f'total words:    {self.length}')
-        lines.append(f'unique words:   {self.unique}')
-        lines.append(f'unique / total: {prettify(self.ratio)}')
+        lines.append(f'total words:                 {self.length}')
+        lines.append(f'unique words:                {self.unique}')
+        lines.append(f'unique / total:              {prettify(self.ratio)}')
         graph = self.graph(GRAPH_BINS)
         graph_str = ' + '.join(map(prettify, graph))
-        lines.append(f'{graph_str} = {prettify(sum(graph))}')
+        lines.append(f'initial occurence breakdown: {graph_str} = {prettify(sum(graph))}')
         return '\n'.join(lines)
 
 def analyse_file(filename):
