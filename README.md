@@ -2,7 +2,7 @@
 
 Simple tool to measure word usage in text n stuff
 
-Made to estimate the efficacy of various texts in learning new vocabulary. Efficacy correlates with heavy upfront concentration of the initial occurences of words because that means words are repeated more often. The harder the text the longer it must be in order to compensate evenly.
+Made to estimate the efficacy of various texts in learning new vocabulary via extensive reading. Efficacy correlates with heavy upfront concentration of the initial occurences of words because that means words are repeated more often. The harder the text the longer it must be in order to compensate evenly.
 
 ## Examples
 
