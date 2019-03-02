@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys, re, string
+import sys, re
 
 GRAPH_BINS_MAX = 5
 ROUND_DIGITS = 2
