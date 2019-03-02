@@ -2,11 +2,9 @@
 
 Simple tool to measure word usage in text n stuff
 
-Made to estimate the efficacy of various texts in learning new vocabulary via extensive reading. Efficacy correlates with heavy upfront concentration of the initial occurences of words because that means words are repeated more often throughout the rest of the text. The harder the text (more unique words) the longer it has to be in order to compensate evenly.
+Made mainly to measure how useful a text might be for extensive reading!
 
-## Examples
-
-Heavy upfront concentration of initial occurences of words correlate with low percentage of unique usage, which in turn correlates with both text length and text ease.
+## Example
 
 ```bash
 $ ./idionalysis.py texts/*
