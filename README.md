@@ -1,16 +1,28 @@
 # Idionalysis
 
-Simple tool to measure word usage n stuff
+Simple tool to measure word usage in text n stuff
+
+Made to estimate the efficacy of various texts in learning new vocabulary. Efficacy correlates with heavy upfront concentration of the initial occurences of words because that means words are repeated more often. The harder the text the longer it must be in order to compensate evenly.
 
 ## Examples
 
-Moby Dick
+Heavy upfront concentration of initial occurences of words correlate with percentage of low percentage of unique usage, which in turn correlates with both text length and text ease.
+
+Moby Dick (Long and Hard)
 ```bash
 $ ./idionalysis.py ~/text/moby10b.txt 
 total words:                 214112
 unique words:                31641
 unique / total:              14.78%
 initial occurence breakdown: 38.96% + 24.76% + 18.49% + 17.79% = 100.0%
+```
+Harry Potter and the Deathly Hallows (Long and Easy)
+```bash
+$ ./idionalysis.py ~/text/harry7.txt
+total words:                 200119
+unique words:                22538
+unique / total:              11.26%
+initial occurence breakdown: 43.13% + 22.82% + 18.5% + 15.56% = 100.0%
 ```
 Alice in Wonderland
 ```bash
@@ -43,12 +55,4 @@ total words:                 42166
 unique words:                6512
 unique / total:              15.44%
 initial occurence breakdown: 38.93% + 25.35% + 16.32% + 19.39% = 100.0%
-```
-Harry Potter and the Deathly Hallows
-```bash
-$ ./idionalysis.py ~/text/harry7.txt
-total words:                 200119
-unique words:                22538
-unique / total:              11.26%
-initial occurence breakdown: 43.13% + 22.82% + 18.5% + 15.56% = 100.0%
 ```
