@@ -4,7 +4,7 @@ import sys, re
 import matplotlib.pyplot as plt
 
 GRAPH = True
-GRAPH_BINS_VISUAL = 100
+GRAPH_BINS_VISUAL = 25
 GRAPH_BINS_MAX = 5
 ROUND_DIGITS = 2
 #WORD_REGEXP = r'\w+[\'\-]?\w+'
@@ -203,6 +203,7 @@ def bulk_analyse(filenames):
     if GRAPH:
         # totes stole this from stack overflow
         plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
+        plt.gca().set_xticklabels(['{:.0f}%'.format(x*100/GRAPH_BINS_VISUAL) for x in plt.gca().get_xticks()])
         # show it
         plt.legend()
         plt.show()
