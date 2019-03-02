@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
+import sys, re, string
 
-GRAPH_BINS = 4
+GRAPH_BINS_MAX = 5
 ROUND_DIGITS = 2
 
 def divide(n, m):
@@ -19,6 +19,10 @@ def divide(n, m):
         m -= 1
     return divisions
 
+def clean(s):
+    ''' remove non alphabet characters '''
+    return re.sub(r'[' + string.punctuation + string.digits + ']', '', s)
+
 class Analysis:
     ''' a report of data from analysis '''
 
@@ -26,7 +30,7 @@ class Analysis:
     def from_text(text):
         ''' create an analysis from a text '''
         analysis = Analysis()
-        analysis.analyse(text)
+        analysis.analyse(clean(text))
         return analysis
 
     def __init__(self, words=None, initial_encounters=None, occurences=None):
@@ -107,9 +111,10 @@ class Analysis:
         lines.append(f'total words:                 {self.length}')
         lines.append(f'unique words:                {self.unique}')
         lines.append(f'unique / total:              {prettify(self.ratio)}')
-        graph = self.graph(GRAPH_BINS)
-        graph_str = ' + '.join(map(prettify, graph))
-        lines.append(f'initial occurence breakdown: {graph_str} = {prettify(sum(graph))}')
+        for bins in range(2, GRAPH_BINS_MAX + 1):
+            graph = self.graph(bins)
+            graph_str = ' + '.join(map(prettify, graph))
+            lines.append(f'initial occurence breakdown: {graph_str} = {prettify(sum(graph))}')
         return '\n'.join(lines)
 
 def analyse_file(filename):
@@ -117,7 +122,8 @@ def analyse_file(filename):
         return Analysis.from_text(f.read())
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        print(analyse_file(sys.argv[1]))
+    if len(sys.argv) > 1:
+        for filename in sys.argv[1:]:
+            print(f'{filename}:\n{analyse_file(filename)}\n')
     else:
         print(f'Usage: {sys.argv[0]} [text file]')
