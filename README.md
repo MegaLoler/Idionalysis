@@ -96,3 +96,4 @@ singly / unique:       50.17%
 
 ![Example Comparison Plot](example.png)
 ![Example Alice Plot](alice.png)
+![Example Alice Plot 2](alice2.png)
