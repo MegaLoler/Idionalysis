@@ -86,7 +86,8 @@ class Analysis:
         for length in chunk_lengths:
             end = start + length
             initial_encounters = self.initial_encounters[start:end]
-            chunk = Analysis(self.words, initial_encounters)
+            words = self.words[start:end]
+            chunk = Analysis(words, initial_encounters)
             chunks.append(chunk)
             start += length
         return chunks
@@ -94,12 +95,18 @@ class Analysis:
     def graph(self, chunks):
         ''' return concentration of initial occurences of vocabulary in each chunk '''
         chunks = self.divide(chunks)
-        return list(map(lambda chunk: chunk.unique / self.unique, chunks))
+        #return list(map(lambda chunk: chunk.unique / self.unique, chunks))
+        return list(map(lambda chunk: chunk.unique / chunk.length, chunks))
 
     @property
     def length(self):
         ''' return how many words in the text '''
         return len(self.words)
+
+    @property
+    def repeats(self):
+        ''' return how many times a word appears for a second time or more '''
+        return self.initial_encounters.count(False)
 
     @property
     def unique(self):
@@ -151,7 +158,7 @@ class Analysis:
         for bins in range(2, GRAPH_BINS_MAX + 1):
             graph = self.graph(bins)
             graph_str = ' + '.join(map(prettify, graph))
-            lines.append(f'initial occurence breakdown: {graph_str} = {prettify(sum(graph))}')
+            lines.append(f'initial occurence breakdown: {graph_str}')
         return '\n'.join(lines)
 
 def graph(name, analysis):
@@ -163,7 +170,7 @@ def graph(name, analysis):
     plt.figure(name)
     plt.title(name)
     plt.xlabel('% text position')
-    plt.ylabel('% concentration of initial encounters of words')
+    plt.ylabel('% newly encountered words')
     plt.bar(range(0, GRAPH_BINS_VISUAL), analysis.graph(GRAPH_BINS_VISUAL), align='edge')
     # and stats
     lines = list()
@@ -217,7 +224,7 @@ def bulk_analyse(filenames):
         plt.figure('Idionalysis')
         plt.title('Comparison')
         plt.xlabel('% text position')
-        plt.ylabel('% concentration of initial encounters of words')
+        plt.ylabel('% newly encountered words')
     # first get each individual analyses
     analyses = list(map(analyse_file, filenames))
     # and print each result
