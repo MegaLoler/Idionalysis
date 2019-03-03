@@ -4,6 +4,10 @@ import sys, re
 import matplotlib.pyplot as plt
 
 GRAPH = True
+GRAPH_LOCAL = True
+GRAPH_BAR = True
+GRAPH_ENCOUNTERS = True
+WORD_ENCOUNTERS_PLOT = 1, 2, 3, 5, 10, 25, 50, 100
 GRAPH_BINS_VISUAL = 25
 GRAPH_BINS_MAX = 5
 ROUND_DIGITS = 2
@@ -42,9 +46,9 @@ class Analysis:
         analysis.analyse(text)
         return analysis
 
-    def __init__(self, words=None, initial_encounters=None, occurences=None):
+    def __init__(self, words=None, encounters=None, occurences=None):
         self.words = words
-        self.initial_encounters = initial_encounters
+        self.encounters = encounters
         self.occurences = occurences
 
     def analyse(self, text):
@@ -52,25 +56,23 @@ class Analysis:
         # get the words in the text
         self.words = re.findall(WORD_REGEXP, text)
         # to be list of bools corresponding to which words are first encounters
-        self.initial_encounters = list()
+        self.encounters = list()
         # keep track of unique words and their number of occurences
         self.occurences = dict()
         # loop through each word
         for word in self.words:
             # record word count
             # and whether its a first encounter
-            self.initial_encounters.append(self.count(word))
+            self.encounters.append(self.count(word))
 
     def count(self, word):
         ''' increase the number of occurences for a word '''
         # be case insensitive
         word = word.lower()
-        # check if it's a first encounter
-        initial_encounter = word not in self.occurences
         # make the appropriate record
-        self.occurences[word] = 1 if initial_encounter else self.occurences[word] + 1
-        # return whether it was a first encounter
-        return initial_encounter
+        self.occurences[word] = 1 if word not in self.occurences else self.occurences[word] + 1
+        # return the original count
+        return self.occurences[word] - 1
 
     def divide(self, chunks):
         ''' divide the analysis into smaller chunks '''
@@ -85,9 +87,9 @@ class Analysis:
         start = 0
         for length in chunk_lengths:
             end = start + length
-            initial_encounters = self.initial_encounters[start:end]
+            encounters = self.encounters[start:end]
             words = self.words[start:end]
-            chunk = Analysis(words, initial_encounters)
+            chunk = Analysis(words, encounters)
             chunks.append(chunk)
             start += length
         return chunks
@@ -97,10 +99,19 @@ class Analysis:
         chunks = self.divide(chunks)
         return list(map(lambda chunk: chunk.unique / chunk.length, chunks))
 
-    def graph_repeats(self, chunks):
+    def graph_repeats(self, chunks, threshold=1):
         ''' return how many words are non new encounters in each segment '''
         chunks = self.divide(chunks)
-        return list(map(lambda chunk: chunk.repeats / chunk.length, chunks))
+        return list(map(lambda chunk: chunk.repeats(threshold) / chunk.length, chunks))
+
+    def graph_familiarity(self, chunks):
+        ''' return how 'familiar' the word content is for each chunk '''
+        chunks = self.divide(chunks)
+        return list(map(lambda chunk: 1 - 1 / (sum(chunk.encounters) / chunk.length), chunks))
+
+    def repeats(self, threshold=1):
+        ''' return how many times a word appears for a number of times or more '''
+        return list(map(lambda count: count >= threshold, self.encounters)).count(True)
 
     @property
     def length(self):
@@ -108,14 +119,9 @@ class Analysis:
         return len(self.words)
 
     @property
-    def repeats(self):
-        ''' return how many times a word appears for a second time or more '''
-        return self.initial_encounters.count(False)
-
-    @property
     def unique(self):
         ''' return how many unique words in the text '''
-        return len(self.occurences) if self.occurences else self.initial_encounters.count(True)
+        return len(self.occurences) if self.occurences else self.encounters.count(0)
 
     @property
     def uniques(self):
@@ -170,30 +176,44 @@ def graph(name, analysis):
     # the main graph
     plt.figure('Idionalysis')
     plt.plot(analysis.graph_repeats(GRAPH_BINS_VISUAL), label=name)
-    # the local graph
-    plt.figure(name)
-    plt.title(name)
-    plt.xlabel('% text position')
-    plt.ylabel('% newly encountered words')
-    plt.bar(range(0, GRAPH_BINS_VISUAL), analysis.graph_new(GRAPH_BINS_VISUAL), align='edge')
-    # and stats
-    lines = list()
-    lines.append(f'total words: ')
-    lines.append(f'unique words: ')
-    lines.append(f'unique / total: ')
-    lines.append(f'singly occuring words: ')
-    lines.append(f'singly / unique: ')
-    plt.figtext(0.7, 0.55, '\n'.join(lines), horizontalalignment='right')
-    lines = list()
-    lines.append(f'{analysis.length}')
-    lines.append(f'{analysis.unique}')
-    lines.append(f'{prettify(analysis.ratio)}')
-    lines.append(f'{analysis.singles}')
-    lines.append(f'{prettify(analysis.singles / analysis.unique)}')
-    plt.figtext(0.7, 0.55, '\n'.join(lines))
-    # totes stole this from stack overflow
-    plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
-    plt.gca().set_xticklabels(['{:.0f}%'.format(x*100/GRAPH_BINS_VISUAL) for x in plt.gca().get_xticks()])
+    # the local graph(s)
+    if GRAPH_LOCAL:
+        if GRAPH_BAR:
+            plt.figure(f'{name} new')
+            plt.title(f'{name} new')
+            plt.xlabel('% text position')
+            plt.ylabel('% newly encountered words')
+            # initial
+            plt.bar(range(0, GRAPH_BINS_VISUAL), analysis.graph_new(GRAPH_BINS_VISUAL), align='edge')
+            # and stats
+            lines = list()
+            lines.append(f'total words: ')
+            lines.append(f'unique words: ')
+            lines.append(f'unique / total: ')
+            lines.append(f'singly occuring words: ')
+            lines.append(f'singly / unique: ')
+            plt.figtext(0.7, 0.55, '\n'.join(lines), horizontalalignment='right')
+            lines = list()
+            lines.append(f'{analysis.length}')
+            lines.append(f'{analysis.unique}')
+            lines.append(f'{prettify(analysis.ratio)}')
+            lines.append(f'{analysis.singles}')
+            lines.append(f'{prettify(analysis.singles / analysis.unique)}')
+            plt.figtext(0.7, 0.55, '\n'.join(lines))
+            # totes stole this from stack overflow
+            plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
+            plt.gca().set_xticklabels(['{:.0f}%'.format(x*100/GRAPH_BINS_VISUAL) for x in plt.gca().get_xticks()])
+        if GRAPH_ENCOUNTERS:
+            plt.figure(f'{name} encounters')
+            plt.title(f'{name} encounters')
+            plt.xlabel('% text position')
+            plt.ylabel('% words')
+            for x in WORD_ENCOUNTERS_PLOT:
+                plt.plot(analysis.graph_repeats(GRAPH_BINS_VISUAL, x), label=f'encountered {x} times')
+            plt.legend()
+            # totes stole this from stack overflow
+            plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
+            plt.gca().set_xticklabels(['{:.0f}%'.format(x*100/GRAPH_BINS_VISUAL) for x in plt.gca().get_xticks()])
 
 def analyse_file(filename):
     ''' do an analysis on a file '''
@@ -241,11 +261,11 @@ def bulk_analyse(filenames):
     # show the graph if any
     if GRAPH:
         plt.figure('Idionalysis')
+        plt.legend()
         # totes stole this from stack overflow
         plt.gca().set_yticklabels(['{:.0f}%'.format(x*100) for x in plt.gca().get_yticks()])
         plt.gca().set_xticklabels(['{:.0f}%'.format(x*100/GRAPH_BINS_VISUAL) for x in plt.gca().get_xticks()])
         # show it
-        plt.legend()
         plt.show()
 
 if __name__ == '__main__':
