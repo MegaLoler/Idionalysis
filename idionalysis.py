@@ -92,11 +92,15 @@ class Analysis:
             start += length
         return chunks
 
-    def graph(self, chunks):
+    def graph_new(self, chunks):
         ''' return concentration of initial occurences of vocabulary in each chunk '''
         chunks = self.divide(chunks)
-        #return list(map(lambda chunk: chunk.unique / self.unique, chunks))
         return list(map(lambda chunk: chunk.unique / chunk.length, chunks))
+
+    def graph_repeats(self, chunks):
+        ''' return how many words are non new encounters in each segment '''
+        chunks = self.divide(chunks)
+        return list(map(lambda chunk: chunk.repeats / chunk.length, chunks))
 
     @property
     def length(self):
@@ -148,30 +152,30 @@ class Analysis:
         top = ', '.join(self.top)
         bottom = ', '.join(self.bottom)
         lines = list()
-        lines.append(f'total words:                 {self.length}')
-        lines.append(f'unique words:                {self.unique}')
-        lines.append(f'unique / total:              {prettify(self.ratio)}')
-        lines.append(f'singly occuring words:       {self.singles}')
-        lines.append(f'singly / unique:             {prettify(self.singles / self.unique)}')
-        lines.append(f'top 5:                       {top}')
-        lines.append(f'bottom 5:                    {bottom}')
+        lines.append(f'total words:             {self.length}')
+        lines.append(f'unique words:            {self.unique}')
+        lines.append(f'unique / total:          {prettify(self.ratio)}')
+        lines.append(f'singly occuring words:   {self.singles}')
+        lines.append(f'singly / unique:         {prettify(self.singles / self.unique)}')
+        lines.append(f'top 5:                   {top}')
+        lines.append(f'bottom 5:                {bottom}')
         for bins in range(2, GRAPH_BINS_MAX + 1):
-            graph = self.graph(bins)
+            graph = self.graph_new(bins)
             graph_str = ' + '.join(map(prettify, graph))
-            lines.append(f'initial occurence breakdown: {graph_str}')
+            lines.append(f'new encounter breakdown: {graph_str}')
         return '\n'.join(lines)
 
 def graph(name, analysis):
     ''' display the analysis visually '''
     # the main graph
     plt.figure('Idionalysis')
-    plt.plot(analysis.graph(GRAPH_BINS_VISUAL), label=name)
+    plt.plot(analysis.graph_repeats(GRAPH_BINS_VISUAL), label=name)
     # the local graph
     plt.figure(name)
     plt.title(name)
     plt.xlabel('% text position')
     plt.ylabel('% newly encountered words')
-    plt.bar(range(0, GRAPH_BINS_VISUAL), analysis.graph(GRAPH_BINS_VISUAL), align='edge')
+    plt.bar(range(0, GRAPH_BINS_VISUAL), analysis.graph_new(GRAPH_BINS_VISUAL), align='edge')
     # and stats
     lines = list()
     lines.append(f'total words: ')
@@ -224,7 +228,7 @@ def bulk_analyse(filenames):
         plt.figure('Idionalysis')
         plt.title('Comparison')
         plt.xlabel('% text position')
-        plt.ylabel('% newly encountered words')
+        plt.ylabel('% already encountered words')
     # first get each individual analyses
     analyses = list(map(analyse_file, filenames))
     # and print each result
